@@ -1,5 +1,13 @@
 # iot-raspberry
 
+라즈베리파이에 MariaDB 설치 - HeidiSQL 연결
+
+https://andjjip.tistory.com/114?category=877844
+
+https://andjjip.tistory.com/115
+
+참조
+
 
 
 ## 안내
