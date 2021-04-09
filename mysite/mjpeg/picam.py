@@ -74,7 +74,7 @@ class MJpegStreamCam(PiCam):
             image = frame.getvalue()
             yield (b'--myboundary\n'
                     b'Content-Type::image/jpeg\n'
-                    b'Content-Length: ' + f"{len(image)}.encode() + b'\n'"
+                    b'Content-Length: ' + f"{len(image)}".encode() + b'\n'
                     b'\n' + image + b'\n')
             frame.seek(0)
             
