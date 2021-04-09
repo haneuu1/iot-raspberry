@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from mjpeg.view import *
+from mjpeg.views import *
 
 urlpatterns = [
     path('', CamView.as_view()),
