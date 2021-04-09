@@ -12,10 +12,6 @@ class CamView(TemplateView):
         context["mode"] = self.request.GET.get("mode", "#")
         return context
 
-    def motion_detected(request):
-        image = mjpegstream.motion_detected()
-        return HttpResponse(image, content_type ="image/.h264")
-
     def mjpeg_stream(request):
         return StreamingHttpResponse(mjpegstream,
         content_type='multipart/x-mixed-replace;boundary=--myboundary')

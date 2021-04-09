@@ -7,15 +7,12 @@
 </head>
 <body>
     <div>
-        <a href="?mode=motion_detected">촬영</a>
         <a href="?mode=stream">CCTV</a>
     </div>
     <br>
 
     {% if mode == "#" %}
     <img id="image" />
-    {% elif mode == "motion_detected" %}
-        <img id="image" src="{% url 'motion_detected' %}"/>
     {% elif mode == "stream" %}
         <img id="image" src="{% url 'stream' %}"/>
 </body>
