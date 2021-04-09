@@ -12,6 +12,6 @@ class CamView(TemplateView):
         context["mode"] = self.request.GET.get("mode", "#")
         return context
 
-    def mjpeg_stream(request):
-        return StreamingHttpResponse(mjpegstream,
-        content_type='multipart/x-mixed-replace;boundary=--myboundary')
+def mjpeg_stream(request):
+    return StreamingHttpResponse(mjpegstream,
+    content_type='multipart/x-mixed-replace;boundary=--myboundary')
