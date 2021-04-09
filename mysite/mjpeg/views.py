@@ -13,7 +13,8 @@ class CamView(TemplateView):
         return context
 
     def motion_detected(request):
-        pass
+        image = mjpegstream.motion_detected()
+        return HttpResponse(image, content_type ="image/.h264")
 
     def mjpeg_stream(request):
         return StreamingHttpResponse(mjpegstream,
