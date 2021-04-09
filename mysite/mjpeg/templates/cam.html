@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCTV 영상</title>
+</head>
+<body>
+    <div>
+        <a href="?mode=motion_detect">촬영</a>
+        <a href="?mode=stream">CCTV</a>
+    </div>
+    <br>
+
+    {% if mode == "#" %}
+    <img id="image" />
+    {% elif mode == "motion_detect" %}
+        <img id="image" src="{% url 'motion_detect' %}"/>
+    {% elif mode == "stream" %}
+        <img id="image" src="{% url 'stream' %}"/>
+</body>
+</html>
