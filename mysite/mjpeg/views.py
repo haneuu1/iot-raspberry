@@ -12,9 +12,8 @@ class CamView(TemplateView):
         context["mode"] = self.request.GET.get("mode", "#")
         return context
 
-    def snapshot(request):
-        image=mjpegstream.snapshot()
-        return HttpResponse(image, content_type="image/jpeg")
+    def motion_detected(request):
+        pass
 
     def mjpeg_stream(request):
         return StreamingHttpResponse(mjpegstream,

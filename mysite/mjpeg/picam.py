@@ -3,7 +3,11 @@ import io
 import time
 import numpy as np
 from picamera.array import PiRGBArray
-from picamera import PiCamera
+from picamera import PiCamera, PiCameraCircularIO
+import datetime
+import random
+
+savepath = '/home/pi/Desktop/cctv recording'
 
 class PiCam:
     def __init__(self, show=True, framerate=25, width=640, height=480):
@@ -15,12 +19,6 @@ class PiCam:
         self.camera.rotation = 180
         self.camera.resolution = self.size
         self.camera.framerate = self.framerate
-
-        def snapshot(self):
-            frame = io.BytesIO()
-            self.camera.capture(frame, 'jpeg', use_video_port=True)
-            frame.seek(0)
-            return frame.getvalue()
 
         def __iter__(self):
             rawCapture = PiRGBArray(self.camera, size=self.camera.resolution)
@@ -44,6 +42,27 @@ class PiCam:
                             rawCapture.truncate(0)
 
                         cv2.destroyAllWindows()
+
+        def motion_detected(self):
+            return random.randint(0, 10) == 0
+
+        camera = PiCamera()
+        stream = PiCameraCircularIO(camera, seconds=10)
+        camera.resolution = (640, 480)
+        now = datetime.datetime.now()
+        filename = now.strftime('%Y-%m-%d %H:#M:%S')
+        camera.start_recording(stream, format='h264')
+        try:
+            while True:
+                camera.wait_recording(1)
+                if motion_detected():
+                    camera.wait_recording(10)
+                    stream.copy_to(output = savepath + "/" + filename + '.h264')
+
+        finally:
+            camera.stop_recording()
+
+
 
 class MJpegStreamCam(PiCam):
     def __init__(self, show=True, framerate=25, width=640, height=480):

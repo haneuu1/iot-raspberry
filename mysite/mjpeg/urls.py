@@ -4,6 +4,6 @@ from mjpeg.view import *
 
 urlpatterns = [
     path('', CamView.as_view()),
-    path('snapshot/', snapshot, name='snapshot'),
+    path('motion_detected/', motion_detected, name='motion_detected'),
     path('stream/', mjpeg_stream, name='stream'),
     ]
