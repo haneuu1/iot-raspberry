@@ -23,7 +23,7 @@ class PiCam:
         def __iter__(self):
             rawCapture = PiRGBArray(self.camera, size=self.camera.resolution)
             rawCapture.truncate(0)
-            for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+            for frame in self.camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
                 yield frame.array
                 rawCapture.truncate(0)
