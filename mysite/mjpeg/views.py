@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import View, TemplateView
 from django.http import HttpResponse, StreamingHttpResponse, Http404
-from mysite.mjpeg.picam import MJpegStreamCam
+from mjpeg.picam import MJpegStreamCam
 
 mjpegstream = MJpegStreamCam()
 class CamView(TemplateView):
