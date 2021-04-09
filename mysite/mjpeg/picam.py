@@ -43,24 +43,23 @@ class PiCam:
 
                         cv2.destroyAllWindows()
 
-        def motion_detected(self):
+        def motion_detected():
             return random.randint(0, 10) == 0
 
-        camera = PiCamera()
-        stream = PiCameraCircularIO(camera, seconds=10)
-        camera.resolution = (640, 480)
+        stream = PiCameraCircularIO(self.camera, seconds=10)
+        self.camera.resolution = (640, 480)
         now = datetime.datetime.now()
         filename = now.strftime('%Y-%m-%d %H:#M:%S')
-        camera.start_recording(stream, format='h264')
+        self.camera.start_recording(stream, format='h264')
         try:
             while True:
-                camera.wait_recording(1)
+                self.camera.wait_recording(1)
                 if motion_detected():
-                    camera.wait_recording(10)
+                    self.camera.wait_recording(10)
                     stream.copy_to(output = savepath + "/" + filename + '.h264')
 
         finally:
-            camera.stop_recording()
+            self.camera.stop_recording()
 
 
 
@@ -71,7 +70,7 @@ class MJpegStreamCam(PiCam):
     def __iter__(self):
         frame = io.BytesIO()
         while True:
-            self.,camera.capture(frame, format="jpeg", use_video_port=True)
+            self.camera.capture(frame, format="jpeg", use_video_port=True)
             image = frame.getvalue()
             yield (b'--myboundary\n'
                     b'Content-Type::image/jpeg\n'
