@@ -25,7 +25,7 @@ def on_message(client, userdata, msg):
     with open(FILE_NAME, 'at') as f:
         f.write(f'{msg.topic}, {msg.payload}, {datetime.now()}\n')
 
-        if msg.topic == 'iot/control/servo':
+        if msg.topic == 'iot/control/camera/servo':
             print(f"{msg.topic} : {int(msg.payload)}")
             # value = int(msg.payload.decode('utf-8'))
             value = int(msg.payload)

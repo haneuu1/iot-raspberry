@@ -5,7 +5,6 @@ def subscribe(host, topic, on_message, forever=True):
         print(f'Connected with result code {rc}')
         if rc == 0:
             client.subscribe(topic) # 연결 성공시 토픽 구독 신청
-        
         else:
             print('연결 실패: ',rc)
     
