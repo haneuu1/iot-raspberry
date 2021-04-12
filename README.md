@@ -1,12 +1,19 @@
 # iot-raspberry
 
-라즈베리파이에 MariaDB 설치 - HeidiSQL 연결
+** 라즈베리파이에 MariaDB 설치 - HeidiSQL 연결
 
 https://andjjip.tistory.com/114?category=877844
 
 https://andjjip.tistory.com/115
 
 참조
+
+
+
+** django 실행시 init 중복 실행 방지를 위해 아래 코드 사용
+
+python manage.py runserver 0.0.0.0:8000 --noreload
+
 
 
 
