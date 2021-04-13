@@ -1,9 +1,15 @@
 from django.shortcuts import render
 from django.views.generic import View, TemplateView
 from django.http import HttpResponse, StreamingHttpResponse, Http404
-from mjpeg.picam import MJpegStreamCam
 
-mjpegstream = MJpegStreamCam()
+import threading
+import time
+
+from mysite.picam import MJpegStreamCam
+from mysite.pir import pir
+
+mjpegstream = MJpegStreamCam(pir.camera)
+
 class CamView(TemplateView):
     template_name = "cam.html"
 
@@ -13,5 +19,6 @@ class CamView(TemplateView):
         return context
 
 def mjpeg_stream(request):
-    return StreamingHttpResponse(mjpegstream,
-    content_type='multipart/x-mixed-replace;boundary=--myboundary')
+    time.sleep(0.2)
+
+    return StreamingHttpResponse(mjpegstream, content_type='multipart/x-mixed-replace;boundary=--myboundary')
