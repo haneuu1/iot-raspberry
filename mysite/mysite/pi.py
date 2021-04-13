@@ -1,8 +1,8 @@
 import paho.mqtt.client as mqtt_client
 from mysite.DAO import DataDAO
+from mysite.audio import playsound
 from datetime import datetime
 import random
-
 from gpiozero import MotionSensor, LED, Servo
 import pigpio
 
@@ -12,9 +12,8 @@ led = LED(21)
 cam_servo = 23
 key_servo = 24
 pi = pigpio.pi()
-# pi2 = pigpio.pi()
 pi.set_servo_pulsewidth(cam_servo, 1500)
-# pi2.set_servo_pulsewidth(key_servo, 1500)
+pi.set_servo_pulsewidth(key_servo, 1500)
 # 서보 모터 지터링 방지
 ### 사용전 서버 데몬 기동 필요 $sudo pigpiod
 ### 정지 $sudo killall pigpiod
@@ -51,25 +50,29 @@ class Pi:
         def on_message(client, userdata, msg):
             print(f"Received '{msg.payload.decode()}' from '{msg.topic}' topic")
             topic = msg.topic
-            # msg = msg.payload.decode('utf-8')
-            msg = msg.payload.decode()
-            self.dao.insert_data(topic, msg)
+            message = msg.payload.decode()
+            # message = msg.payload.decode('utf-8')
+            # message = msg.payload.decode('cp949')
+            
+            # self.dao.insert_data(topic, message.encode('utf-8', 'replace'))
+            self.dao.insert_data(topic, message)
 
             if topic == 'iot/control/camera/servo':
                 value = int(msg)
                 pulse_width = 500 + 11.11*(value+90)
                 pi.set_servo_pulsewidth(cam_servo, pulse_width)
-                # pi2.set_servo_pulsewidth(key_servo, pulse_width)
 
             if topic == 'iot/control/voice':
-                pass
-                # 음성 합성
+                # 음성 합성 => 블루투스 스피커 연결시 초반 음 끊김... av jack은 정상 실행
+                ##### PYTHON_LIB의 API_KEY와 TTS_HEADERS의 auth 변경 필요
+                playsound(message)
+                
 
             if topic == 'iot/control/key':
                 value = msg.payload.decode('utf-8')
                 if value == 'password':
                     # door open
-                    pass
+                    pi.set_servo_pulsewidth(key_servo, 2500)
                 else:
                     # buzzer
                     pass
