@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views import generic
 from mqtt.models import MqttData
 
+# Create your views here.
 
 class IndexView(generic.ListView):
     template_name = 'mqtt/index.html'
