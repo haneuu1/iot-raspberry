@@ -7,19 +7,19 @@ import pigpio
 from datetime import datetime
 
 from DAO import DataDAO
+from audio import playsound
 
-HOST = '192.168.35.227'
+HOST = '192.168.35.71'# pc
 PORT = 1883
 TOPIC = 'iot/control/#'
 
-SERVO = 17
+SERVO = 23
 pi = pigpio.pi() 
 pi.set_servo_pulsewidth(SERVO, 1500)
 # 서보 모터 지터링 방지
 ### 사용전 서버 데몬 기동 필요 $sudo pigpiod
 ### 정지 $sudo killall pigpiod
 
-# FILE_NAME = "test.txt"
 dao = DataDAO()
 
 def subscribe(host, port, topic, forever=True):
@@ -32,36 +32,29 @@ def subscribe(host, port, topic, forever=True):
             print('연결 실패 : ', rc)
 
     def on_message(client, userdata, msg):
-        # 구독한 메세지 모두 파일로 저장
-        # with open(FILE_NAME, 'at') as f:
-        # f.write(f'{msg.topic}, {msg.payload}, {datetime.now()}\n')
-
         print(f"Received '{msg.payload.decode()}' from '{msg.topic}' topic")
 
         topic = msg.topic
-        msg = msg.payload.decode()
+        message = msg.payload.decode()
         # msg = msg.payload.decode('utf-8')
         
-        dao.insert_data(topic, msg)
+        dao.insert_data(topic, message)
 
         if topic == 'iot/control/camera/servo':
-            print(f"{topic} : {int(msg)}")
-            # value = int(msg.payload.decode('utf-8'))
-            value = int(msg)
+            value = int(message)
             pulse_width = 500 + 11.11*(value+90)
             pi.set_servo_pulsewidth(SERVO, pulse_width)
 
         if topic == 'iot/control/voice':
-            print(f"{msg.topic} : {str(msg.payload)}")
             # r = requests.get("http://192.168.35.41:8000/mqtt/pir/")
             # print(r.content)
             
-            # 음성 합성
+            # 음성 합성 => 블루투스 스피커 연결시 초반 음 끊김... av jack은 정상 실행
+            ##### PYTHON_LIB/audioapi.py의 API_KEY와 TTS_HEADERS. auth 변경 필요
+            playsound(message, "MAN_DIALOG_BRIGHT")
 
         if topic == 'iot/control/key':
-            print(f"{topic} : {int(msg)}")
-            value = msg.decode('utf-8')
-            if value == 'password':
+            if message == 'password':
                 # door open
                 pass
             else:
