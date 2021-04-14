@@ -9,14 +9,16 @@ from gpiozero import MotionSensor, DistanceSensor
 
 from picamera import PiCamera
 
-HOST = '192.168.35.28' # mqtt 브로커 주소 (pc)
+from mysite.DAO import DataDAO
+
+HOST = '192.168.35.227' # mqtt 브로커 주소 (pc)
 PORT = 1883
 
 topic = 'iot/monitor/pir'
-value = 'off'
+msg = 'off'
 
 class Pir(Thread):
-    def __init__(self, host, port, topic, value):
+    def __init__(self, host, port, topic, msg):
         super().__init__()
         
         # pir 센서
@@ -32,7 +34,7 @@ class Pir(Thread):
         self.host = host
         self.port = port
         self.topic = topic
-        self.value = value
+        self.msg = msg
 
         self.state = False # 초기 값
 
@@ -41,6 +43,14 @@ class Pir(Thread):
 
         self.splitter_port = 2
 
+        self.dao = DataDAO()
+
+
+    def publish(self):
+        self.client.publish(self.topic, self.msg)
+        self.dao.insert_data(self.topic, self.msg)
+
+
     def detected(self):
         # pir 센서
         print('motion detected~~~~~~~~~~~~')
@@ -48,8 +58,10 @@ class Pir(Thread):
         # print('motion detected~~~~~~~~~~~~', self.pir.distance)
 
         self.state = True
-        self.value = 'on'
-        self.client.publish(self.topic, self.value)
+        self.msg = 'on'
+
+        self.publish()
+        # self.client.publish(self.topic, self.msg)
 
         # 녹화 시작
         if (self.state == True) and (self.camera.recording == False):
@@ -69,8 +81,10 @@ class Pir(Thread):
         # print('motion not detected^^^^^^^^^^^^^^', self.pir.distance)
 
         self.state = False
-        self.value = 'off'
-        self.client.publish(self.topic, self.value)
+        self.msg = 'off'
+        
+        self.publish()
+        # self.client.publish(self.topic, self.msg)
 
         # 녹화 중지
         if (self.state == False) and (self.camera.recording == True):
@@ -99,7 +113,7 @@ class Pir(Thread):
         #     if self.pir.motion_detected == True:
         #         self.state = True
         #         print("motion detected----------------")
-        #         self.value = 'on'
+        #         self.msg = 'on'
 
         #         if (self.state == True) and (self.camera.recording == False):
         #             now = datetime.datetime.now()
@@ -110,13 +124,13 @@ class Pir(Thread):
         #     else:
         #         self.state = False
         #         print("No motion !!!!!!!!!!!!!!!!!!!!!")
-        #         self.value = 'off'
+        #         self.msg = 'off'
 
         #         if (self.state == False) and (self.camera.recording == True):
         #             print("stop recording")
         #             self.camera.stop_recording(splitter_port=2)
 
 
-pir = Pir(HOST, PORT, topic, value)
+pir = Pir(HOST, PORT, topic, msg)
 pir.daemon = True
 pir.start()

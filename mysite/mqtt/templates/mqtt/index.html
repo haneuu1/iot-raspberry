@@ -1,0 +1,9 @@
+{% if latest_data_list %}
+<ul class="list-group">
+{% for data in latest_data_list %}
+    <li class="list-group-item"><a href="{% url 'mqtt:detail' data.id %}">{{ data.timestamp }} : {{ data.topic }}, {{ data.msg }} </a></li>
+{% endfor %}
+</ul>
+{% else %}
+<p>No data are available.</p>
+{% endif %}

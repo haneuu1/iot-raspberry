@@ -6,7 +6,7 @@ import threading
 import time
 
 from mysite.picam import MJpegStreamCam
-from mysite.pir import pir
+from mysite.pir_sensor import pir
 
 mjpegstream = MJpegStreamCam(pir.camera)
 
