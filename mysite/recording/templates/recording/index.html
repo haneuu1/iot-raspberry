@@ -1,0 +1,9 @@
+{% if latest_data_list %}
+<ul class="list-group">
+{% for data in latest_data_list %}
+    <li class="list-group-item"><a href="{% url 'recording:detail' data.id %}">{{ data.video_timestamp }} : {{ data.video_root }} </a></li>
+{% endfor %}
+</ul>
+{% else %}
+<p>No data are available.</p>
+{% endif %}
