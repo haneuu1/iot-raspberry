@@ -8,7 +8,7 @@
         <li class="list-group-item">파일명 : {{ object.video_root }}</li>
 
         <video oncontextmenu="return false;" id="myVideo" width="640" controls autoplay>
-            <source src="../../../media/hello.mp4" type="video/mp4">
+            <source src="../../../media/{{ object.video_root }}" type="video/mp4">
         </video>
     </ul>
 </div>

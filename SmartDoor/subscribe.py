@@ -9,7 +9,7 @@ from datetime import datetime
 from DAO import DataDAO
 from audio import playsound
 
-HOST = '192.168.35.71'# pc
+HOST = '192.168.35.227'# pc
 PORT = 1883
 TOPIC = 'iot/control/#'
 
@@ -32,7 +32,7 @@ def subscribe(host, port, topic, forever=True):
             print('연결 실패 : ', rc)
 
     def on_message(client, userdata, msg):
-        # print(f"Received '{msg.payload.decode()}' from '{msg.topic}' topic")
+        print(f"Received '{msg.payload.decode()}' from '{msg.topic}' topic")
 
         topic = msg.topic
         message = msg.payload.decode()
