@@ -1,9 +1,10 @@
 from django.urls import path
-from . import views
+from mqtt.views import *
 
 app_name = 'mqtt'
 
 urlpatterns = [
-    path('', views.IndexView.as_view(), name='index'),
-    path('<int:pk>/', views.DetailView.as_view(), name='detail') 
+    path('', IndexView.as_view(), name='index'),
+    path('<int:pk>/', DetailView.as_view(), name='detail'),
+    path('log/', log, name='log'),
 ]
