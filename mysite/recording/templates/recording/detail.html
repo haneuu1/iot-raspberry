@@ -1,0 +1,14 @@
+<div class>
+    <h1> {{ object.timestamp }} 이 때의 값 </h1>
+</div>
+
+<div class>
+    <ul class="list-group">
+        <li class="list-group-item">시간 : {{ object.video_timestamp }}</li>
+        <li class="list-group-item">파일명 : {{ object.video_root }}</li>
+
+        <video oncontextmenu="return false;" id="myVideo" width="640" controls autoplay>
+            <source src="../../../media/hello.mp4" type="video/mp4">
+        </video>
+    </ul>
+</div>

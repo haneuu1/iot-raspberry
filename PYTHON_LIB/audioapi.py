@@ -12,12 +12,12 @@ import requests
 import json
 import io
 
-API_KEY = "d05c81a18ee102edcf186c513795470a"
+API_KEY = "db172a7f2a2236ada32e3b239aae0089"
 
 TTS_URL = "https://kakaoi-newtone-openapi.kakao.com/v1/synthesize"
 TTS_HEADERS = {
     "Content-Type" : "application/xml",
-    "Authorization" : "KakaoAK d05c81a18ee102edcf186c513795470a"
+    "Authorization" : "KakaoAK db172a7f2a2236ada32e3b239aae0089"
 }
 
 SST_URL = "https://kakaoi-newtone-openapi.kakao.com/v1/recognize"

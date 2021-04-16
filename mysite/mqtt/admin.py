@@ -1,5 +1,4 @@
 from django.contrib import admin
-from mqtt.models import MqttData, AudioData
+from mqtt.models import MqttData
 
 admin.site.register(MqttData)
-admin.site.register(AudioData)

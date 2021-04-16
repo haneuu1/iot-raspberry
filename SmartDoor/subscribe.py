@@ -38,22 +38,20 @@ def subscribe(host, port, topic, forever=True):
         message = msg.payload.decode()
         # msg = msg.payload.decode('utf-8')
         
-        dao.insert_data(topic, message)
 
         if topic == 'iot/control/camera/servo':
             value = int(message)
             pulse_width = 500 + 11.11*(value+90)
             pi.set_servo_pulsewidth(SERVO, pulse_width)
 
-        if topic == 'iot/control/voice':
-            # r = requests.get("http://192.168.35.41:8000/mqtt/pir/")
-            # print(r.content)
-            
+        if topic == 'iot/control/voice':            
             # 음성 합성 => 블루투스 스피커 연결시 초반 음 끊김... av jack은 정상 실행
             ##### PYTHON_LIB/audioapi.py의 API_KEY와 TTS_HEADERS. auth 변경 필요
             playsound(message, "MAN_DIALOG_BRIGHT")
 
         if topic == 'iot/control/key':
+            dao.insert_data(topic, message)
+
             if message == 'password':
                 # door open
                 pass

@@ -9,10 +9,3 @@ class MqttData(models.Model):
     timestamp = models.DateTimeField(auto_now = True)
     topic = models.CharField(max_length = 50)
     msg = models.CharField(max_length = 100)
-
-class AudioData(models.Model):
-    def __str__(self):
-        return f"desc: {self.audiodesc}"
-    
-    audiodesc = models.CharField(max_length = 50)
-    audiosrc = models.FileField()

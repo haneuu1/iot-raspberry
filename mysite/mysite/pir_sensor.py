@@ -9,7 +9,7 @@ from gpiozero import MotionSensor, DistanceSensor
 
 from picamera import PiCamera
 
-from mysite.DAO import DataDAO
+from DAO import DataDAO
 
 HOST = '192.168.35.71' # mqtt 브로커 주소 (pc)
 PORT = 1883
@@ -66,11 +66,12 @@ class Pir(Thread):
         # 녹화 시작
         if (self.state == True) and (self.camera.recording == False):
             now = datetime.datetime.now()
-            fname = now.strftime("%Y%m%d_%H%M") + '.h264'
-            print("start recording")
+            fname = now.strftime("%Y_%m_%d_%H:%M:%S") + '.h264'
+
+            self.dao.insert_recording_data(now, fname)
             
             # Thread(target=self.camera.start_recording, kwargs={'output' : fname, 'splitter_port' : self.splitter_port}, daemon=True).start()
-            self.camera.start_recording(fname, splitter_port=2)
+            self.camera.start_recording("./media/"+fname, splitter_port=2)
 
         time.sleep(5)
 
