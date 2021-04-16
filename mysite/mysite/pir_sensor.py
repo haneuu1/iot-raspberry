@@ -5,11 +5,13 @@ import paho.mqtt.client as mqtt
 import time
 import datetime
 
-from gpiozero import MotionSensor, DistanceSensor
+from gpiozero import MotionSensor
 
 from picamera import PiCamera
 
 from mysite.DAO import DataDAO
+
+from subprocess import call
 
 HOST = '192.168.35.227' # mqtt 브로커 주소 (pc)
 PORT = 1883
@@ -23,9 +25,6 @@ class Pir(Thread):
         
         # pir 센서
         self.pir = MotionSensor(4)
-        
-        # 초음파 센서
-        # self.pir = DistanceSensor(23, 24, max_distance=1, threshold_distance=0.5)
 
         self.camera = PiCamera()
         self.camera.resolution = (640, 480)
@@ -45,6 +44,9 @@ class Pir(Thread):
 
         self.dao = DataDAO()
 
+        self.fname = ""
+        self.now = None
+
 
     def publish(self):
         self.client.publish(self.topic, self.msg)
@@ -52,10 +54,7 @@ class Pir(Thread):
 
 
     def detected(self):
-        # pir 센서
         print('motion detected~~~~~~~~~~~~')
-        # 초음파 센서
-        # print('motion detected~~~~~~~~~~~~', self.pir.distance)
 
         self.state = True
         self.msg = 'on'
@@ -64,22 +63,22 @@ class Pir(Thread):
         # self.client.publish(self.topic, self.msg)
 
         # 녹화 시작
-        if (self.state == True) and (self.camera.recording == False):
-            now = datetime.datetime.now()
-            fname = now.strftime("%Y_%m_%d_%H:%M:%S") + '.h264'
+        if self.camera.recording == False: # 녹화 중이 아니라면
+            print("start recording")
 
-            self.dao.insert_recording_data(now, fname)
+            self.now = datetime.datetime.now() # 녹화 시작 시간
+            self.fname = self.now.strftime("%Y_%m_%d_%H:%M:%S") + '.mp4'
+
+            # self.dao.insert_recording_data(self.now, self.fname)
             
-            # Thread(target=self.camera.start_recording, kwargs={'output' : fname, 'splitter_port' : self.splitter_port}, daemon=True).start()
-            self.camera.start_recording("/home/pi/iot_workspace/smartdoor/iot-raspberry/mysite/media/"+fname, splitter_port=2)
+            # Thread(target=self.camera.start_recording, kwargs={'output' : self.fname, 'splitter_port' : self.splitter_port}, daemon=True).start()
+            # h264 파일은 temp로 저장하고 녹화 종료 후에 fname.mp4로 변환
+            self.camera.start_recording("/home/pi/iot_workspace/smartdoor/iot-raspberry/mysite/media/"+ "temp.h264", splitter_port=2)
 
-        time.sleep(5)
+        time.sleep(5) # 한 번 움직임이 감지되면 5초 녹화
 
     def not_detected(self):
-        # pir 센서
         print('motion not detected^^^^^^^^^^^^^^')
-        # 초음파 센서
-        # print('motion not detected^^^^^^^^^^^^^^', self.pir.distance)
 
         self.state = False
         self.msg = 'off'
@@ -88,11 +87,16 @@ class Pir(Thread):
         # self.client.publish(self.topic, self.msg)
 
         # 녹화 중지
-        if (self.state == False) and (self.camera.recording == True):
+        if self.camera.recording == True: # 녹화 중이라면
             print("stop recording")
             
             # Thread(target=self.camera.stop_recording, kwargs={'splitter_port' : self.splitter_port}, daemon=True).start()
             self.camera.stop_recording(splitter_port=2)
+
+            command = f"MP4Box -add /home/pi/iot_workspace/smartdoor/iot-raspberry/mysite/media/temp.h264 /home/pi/iot_workspace/smartdoor/iot-raspberry/mysite/media/{self.fname}"
+            call([command], shell=True)
+
+            self.dao.insert_recording_data(self.now, self.fname)
 
         time.sleep(1)
         
@@ -118,9 +122,9 @@ class Pir(Thread):
 
         #         if (self.state == True) and (self.camera.recording == False):
         #             now = datetime.datetime.now()
-        #             fname = now.strftime("%Y%m%d_%H%M") + '.h264'
+        #             self.fname = now.strftime("%Y%m%d_%H%M") + '.h264'
         #             print("start recording")
-        #             self.camera.start_recording(fname,splitter_port=2)
+        #             self.camera.start_recording(self.fname,splitter_port=2)
 
         #     else:
         #         self.state = False
@@ -131,6 +135,7 @@ class Pir(Thread):
         #             print("stop recording")
         #             self.camera.stop_recording(splitter_port=2)
 
+time.sleep(3)
 
 pir = Pir(HOST, PORT, topic, msg)
 pir.daemon = True
