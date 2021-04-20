@@ -13,12 +13,20 @@ HOST = '172.30.1.8'# pc
 PORT = 1883
 TOPIC = 'iot/control/#'
 
-SERVO = 23
-pi = pigpio.pi() 
-pi.set_servo_pulsewidth(SERVO, 1500)
-# 서보 모터 지터링 방지
-### 사용전 서버 데몬 기동 필요 $sudo pigpiod
-### 정지 $sudo killall pigpiod
+# 카메라 수평
+SERVO_CAMERA_VERTICAL = 22
+pi_camera_vertical = pigpio.pi()
+pi_camera_vertical.set_servo_pulsewidth(SERVO_CAMERA_VERTICAL, 1500)
+
+# 카메라 수직
+SERVO_CAMERA_HORIZONTAL = 26
+pi_camera_horizontal = pigpio.pi()
+pi_camera_horizontal.set_servo_pulsewidth(SERVO_CAMERA_HORIZONTAL, 1500)
+
+# 도어락
+SERVO_DOOR = 18
+pi_door = pigpio.pi()
+pi_door.set_servo_pulsewidth(SERVO_DOOR, 1500)
 
 dao = DataDAO()
 
@@ -38,23 +46,41 @@ def subscribe(host, port, topic, forever=True):
         message = msg.payload.decode()
         # msg = msg.payload.decode('utf-8')
         
-
-        if topic == 'iot/control/camera/servo':
+        # 카메라 서보 수평 제어
+        if topic == 'iot/control/camera/servo/vertical':
             value = int(message)
-            pulse_width = 500 + 11.11*(value+90)
-            pi.set_servo_pulsewidth(SERVO, pulse_width)
 
+            pulse_width = 500 + 11.11*(value+90)
+            pi_camera_vertical.set_servo_pulsewidth(SERVO_CAMERA_VERTICAL, pulse_width)
+        
+        # 카메라 서보 수직 제어
+        if topic == 'iot/control/camera/servo/horizontal':
+            value = int(message)
+
+            pulse_width = 500 + 11.11*(value+90)
+            pi_camera_horizontal.set_servo_pulsewidth(SERVO_CAMERA_HORIZONTAL, pulse_width)
+        
+        # 안드로이드에서 음성 요청
         if topic == 'iot/control/voice':            
             # 음성 합성 => 블루투스 스피커 연결시 초반 음 끊김... av jack은 정상 실행
             ##### PYTHON_LIB/audioapi.py의 API_KEY와 TTS_HEADERS. auth 변경 필요
             playsound(message, "MAN_DIALOG_BRIGHT")
 
+        # 키패드 혹은 안드로이드에서 문 개방 요청
         if topic == 'iot/control/key':
+            
+            # DB에 저장
             dao.insert_data(topic, message)
 
-            if message == 'password':
-                # door open
-                pass
+            if message == 'on':
+                pulse_width = 500 + 11.11*(90+90)
+                pi_door.set_servo_pulsewidth(SERVO_DOOR, pulse_width)
+
+                time.sleep(3)
+
+                pulse_width = 500 + 11.11*(0+90)
+                pi_door.set_servo_pulsewidth(SERVO_DOOR, pulse_width)
+
             else:
                 # buzzer
                 pass

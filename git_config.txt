@@ -1,0 +1,3 @@
+git remote set-url origin https://yj455454@github.com/haneuu1/iot-raspberry.git
+https://github.com/haneuu1/iot-raspberry.git
+출처: https://mygumi.tistory.com/74 [마이구미의 HelloWorld]
