@@ -40,7 +40,8 @@ INSTALLED_APPS = [
 
     'mjpeg',
     'mqtt',
-    'recording'
+    'recording',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -110,6 +111,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DATETIME_FORMAT': "%Y-%m-%d %H:%M:%S",
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -122,7 +127,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

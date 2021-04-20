@@ -9,9 +9,15 @@ class DataDAO:
         self.username = "root"
         self.password = "0000"
         self.databases = "iot_db"
+
+        # mqtt 데이터
         self.timestamp = None
         self.topic = None
         self.msg = None
+        
+        # recording 데이터
+        self.video_timestamp = None
+        self.video_root = None
 
     def get_conn(self):
         db = MySQLdb.connect(user=self.username, host=self.host, passwd=self.password, db=self.databases)
@@ -32,7 +38,7 @@ class DataDAO:
         INSERT INTO mqtt_mqttdata(timestamp, topic, msg) VALUES(%s, %s, %s)
         """
         
-        print(f"{self.topic}, {self.msg}")
+        # print(f"{self.topic}, {self.msg}")
         
         try:
             cursor.execute(query, (self.timestamp.strftime("%Y-%m-%d %H:%M:%S"), self.topic, self.msg))
@@ -46,7 +52,7 @@ class DataDAO:
             cursor.close()
             self.topic = None
             self.msg = None
-    
+
     # recording 데이터
     def insert_recording_data(self, video_timestamp, video_root):
 
@@ -61,7 +67,7 @@ class DataDAO:
         """
   
         try:
-            cursor.execute(query, (self.video_timestamp.strftime("%Y_%m_%d_%H:%M:%S"), self.video_root))
+            cursor.execute(query, (self.video_timestamp.strftime("%Y-%m-%d %H:%M:%S"), self.video_root))
             con.commit()
 
         except Exception as e:
@@ -73,8 +79,9 @@ class DataDAO:
 
             self.video_timestamp = None
             self.video_root = None
-            
+
     def get_db_data(self, topic):
+
         self.topic = topic
         datas = []
         con = self.get_conn()
@@ -97,7 +104,8 @@ class DataDAO:
         finally:
             cursor.close()
             self.topic = None
-
+    
+    
 # if __name__ == "__main__":
 #     d = DataDAO()
 #     d.insert_data('topic', 'msg')
