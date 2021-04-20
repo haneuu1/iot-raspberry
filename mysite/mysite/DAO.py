@@ -5,19 +5,13 @@ from django import db
 
 class DataDAO:
     def __init__(self):
-        self.host = "192.168.35.41" # 라즈베리파이 ip - database
+        self.host = "192.168.35.177" # 라즈베리파이 ip - database
         self.username = "root"
         self.password = "0000"
         self.databases = "iot_db"
-
-        # mqtt 데이터
         self.timestamp = None
         self.topic = None
         self.msg = None
-        
-        # recording 데이터
-        self.video_timestamp = None
-        self.video_root = None
 
     def get_conn(self):
         db = MySQLdb.connect(user=self.username, host=self.host, passwd=self.password, db=self.databases)
@@ -52,7 +46,7 @@ class DataDAO:
             cursor.close()
             self.topic = None
             self.msg = None
-
+    
     # recording 데이터
     def insert_recording_data(self, video_timestamp, video_root):
 
@@ -79,8 +73,31 @@ class DataDAO:
 
             self.video_timestamp = None
             self.video_root = None
-    
-    
+            
+    def get_db_data(self, topic):
+        self.topic = topic
+        datas = []
+        con = self.get_conn()
+        cursor = self.get_cursor(con)
+        print('access to db')
+        query = "SELECT * FROM mqtt_mqttdata WHERE topic = %s"
+
+        try:
+            cursor.execute(query, [self.topic])
+            res = cursor.fetchall() 
+            for data in res: 
+                datas.insert(0, data)
+            con.commit()
+            return datas
+
+        except Exception as e:
+            print(traceback.format_exc())
+            cursor.close()
+        
+        finally:
+            cursor.close()
+            self.topic = None
+
 # if __name__ == "__main__":
 #     d = DataDAO()
 #     d.insert_data('topic', 'msg')
