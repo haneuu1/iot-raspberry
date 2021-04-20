@@ -5,7 +5,7 @@ from django import db
 
 class DataDAO:
     def __init__(self):
-        self.host = "192.168.35.41" # 라즈베리파이 ip - database
+        self.host = "172.30.1.116" # 라즈베리파이 ip - database
         self.username = "root"
         self.password = "0000"
         self.databases = "iot_db"
@@ -38,7 +38,7 @@ class DataDAO:
         INSERT INTO mqtt_mqttdata(timestamp, topic, msg) VALUES(%s, %s, %s)
         """
         
-        print(f"{self.topic}, {self.msg}")
+        # print(f"{self.topic}, {self.msg}")
         
         try:
             cursor.execute(query, (self.timestamp.strftime("%Y-%m-%d %H:%M:%S"), self.topic, self.msg))
@@ -67,7 +67,7 @@ class DataDAO:
         """
   
         try:
-            cursor.execute(query, (self.video_timestamp.strftime("%Y_%m_%d_%H:%M:%S"), self.video_root))
+            cursor.execute(query, (self.video_timestamp.strftime("%Y-%m-%d %H:%M:%S"), self.video_root))
             con.commit()
 
         except Exception as e:
@@ -79,6 +79,31 @@ class DataDAO:
 
             self.video_timestamp = None
             self.video_root = None
+
+    def get_db_data(self, topic):
+
+        self.topic = topic
+        datas = []
+        con = self.get_conn()
+        cursor = self.get_cursor(con)
+        print('access to db')
+        query = "SELECT * FROM mqtt_mqttdata WHERE topic = %s"
+
+        try:
+            cursor.execute(query, [self.topic])
+            res = cursor.fetchall() 
+            for data in res: 
+                datas.insert(0, data)
+            con.commit()
+            return datas
+
+        except Exception as e:
+            print(traceback.format_exc())
+            cursor.close()
+        
+        finally:
+            cursor.close()
+            self.topic = None
     
     
 # if __name__ == "__main__":

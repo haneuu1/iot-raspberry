@@ -27,8 +27,8 @@ class Pir(threading.Thread):
         self.pir = MotionSensor(4)
         
         # 초음파 센서
-        # self.ultra = DistanceSensor(24, 25, max_distance=1)
-        # self.threshold_distance = 0.3
+        self.ultra = DistanceSensor(24, 25, max_distance=1)
+        self.threshold_distance = 0.3
 
         self.camera = PiCamera()
         self.camera.resolution = (640, 480)
@@ -57,21 +57,20 @@ class Pir(threading.Thread):
 
 
     def run(self):
-        time.sleep(5)
+        time.sleep(10)
         while True:
             # 움직임이 감지되면
 
             # pir 센서
-            if self.pir.motion_detected == True:
+            # if self.pir.motion_detected == True:
 
             # 초음파 센서
-            # if self.ultra.distance <= self.threshold_distance:
-
+            if self.ultra.distance <= self.threshold_distance:
                 # pir 센서
-                print("motion detected----------------")
+                # print("motion detected----------------")
 
                 # 초음파 센서
-                # print("motion detected----------------", self.ultra.distance)
+                print("motion detected----------------", self.ultra.distance)
                 self.state = True
                 self.msg = 'on'
 
@@ -80,7 +79,9 @@ class Pir(threading.Thread):
                 if self.camera.recording == False:
                     print("start recording")
                     self.now = datetime.datetime.now() # 녹화 시작 시간
-                    self.fname = self.now.strftime("%Y-%m-%d_%H:%M:%S") + '.mp4'
+                    self.fname = self.now.strftime("%Y_%m_%d_%H:%M:%S") + '.mp4'
+
+                    # self.dao.insert_recording_data(self.now, self.fname)
                     
                     # threading.Thread(target=self.camera.start_recording, kwargs={'output' : self.fname, 'splitter_port' : self.splitter_port}, daemon=True).start()
                     # h264 파일은 temp로 저장하고 녹화 종료 후에 fname.mp4로 변환

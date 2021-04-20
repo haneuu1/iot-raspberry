@@ -25,7 +25,7 @@ SECRET_KEY = 'j@-hwt$)1-cxcim_hma3zh%wux+yit%gdbo6y7766fby7ba&7('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.35.227', '192.168.35.41']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.35.227', '192.168.35.41', '192.168.35.101', '192.168.35.115', '172.30.1.8', '172.30.1.116']
 
 
 # Application definition
@@ -40,7 +40,8 @@ INSTALLED_APPS = [
 
     'mjpeg',
     'mqtt',
-    'recording'
+    'recording',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -110,6 +111,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DATETIME_FORMAT': "%Y-%m-%d %H:%M:%S",
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -122,7 +127,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

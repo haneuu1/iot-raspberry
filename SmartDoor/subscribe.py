@@ -9,7 +9,7 @@ from datetime import datetime
 from DAO import DataDAO
 from audio import playsound
 
-HOST = '192.168.35.227'# pc
+HOST = '172.30.1.8'# pc
 PORT = 1883
 TOPIC = 'iot/control/#'
 
