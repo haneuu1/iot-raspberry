@@ -1,6 +1,17 @@
 import RPi.GPIO as GPIO
 import time
 import json
+import paho.mqtt.client as mqtt
+from DAO import DataDAO
+
+HOST = '172.30.1.111' # mqtt 브로커 주소 (pc)
+PORT = 1883
+
+topic = 'iot/control/key'
+msg = 'on'
+
+client = mqtt.Client()
+client.connect(HOST, PORT)
 
 """No. of keys"""
 inputKeys=16
@@ -60,7 +71,7 @@ def read_password():
     with open('doorlock.json', 'r') as f:
         json_data = json.load(f)
         # print(json.dumps(json_data['password']))
-        return json_data
+        return json_data['password']
 
 def write_password(password):
     doorlock = dict()
@@ -74,20 +85,36 @@ try:
         key=getKey()
         if key:
             if (key != 'd'): # keypad 입력중
-                input += key
+                    input += key
             else: # keypad 입력 완료
-                print(f'input: {input}')
-                if input[0] == 'a': # 번호 입력 시작
-                    print(f'input: {input}')
-                    if input[1:] == read_password()['password']:
-                        print('open!')
-                        # 문 열림
+                # print(f'input: {input}')
+                if input:
+                    if input[0] == 'a': # 번호 입력 시작
+                        print(f'input: {input}')
+                        if input[1:] == read_password():
+                            print('open!')
+                            client.publish(topic, msg)
+                            # 문 열림
 
-                    elif (input[1:read_password()['length']+1] == read_password()['password'] and input[read_password()['length']+1] == '#'):
-                        PASSWORD = input[read_password()['length']+2:]
-                        write_password(PASSWORD)
-                        print(f'비밀번호 변경: {PASSWORD}')
+                        elif (input.find('#') != -1):
+                            ix = input.find('#') + 1
+                            if input[1:ix] == read_password():
+                                PASSWORD = input[ix+1:]
+                                write_password(PASSWORD)
+                                print(f'비밀번호 변경: {PASSWORD}')
+                            else:
+                                print('비밀번호 변경실패! Password Mismatched!')
 
+                        # elif (input[1:read_password()['length']+1] == read_password()['password'] and input[read_password()['length']+1] == '#'):
+                        #     PASSWORD = input[read_password()['length']+2:]
+                        #     write_password(PASSWORD)
+                        #     print(f'비밀번호 변경: {PASSWORD}')
+                        
+                        else:
+                            print("Password Mismatched!")
+                    else:
+                        print('a로 입력시작')
+                        input = ''
                 # elif input[0]=='#': # 새로운 비밀번호 입력 시작
                 #     PASSWORD = input[1:]
                 #     write_password(PASSWORD)
