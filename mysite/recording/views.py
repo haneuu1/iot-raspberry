@@ -19,6 +19,6 @@ from .serializers import RecordingDataSerializer
 #     template_name = 'recording/detail.html'
 
 class RecordingDataViewSet(viewsets.ModelViewSet):
-    queryset = RecordingData.objects.all()
+    queryset = RecordingData.objects.all().order_by('-video_timestamp')
     serializer_class = RecordingDataSerializer
 

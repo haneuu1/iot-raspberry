@@ -58,54 +58,62 @@ class Pir(threading.Thread):
 
     def run(self):
         time.sleep(5)
-        while True:
-            # 움직임이 감지되면
-
-            # pir 센서
-            if self.pir.motion_detected == True:
-
-            # 초음파 센서
-            # if self.ultra.distance <= self.threshold_distance:
+        try:
+            while True:
+                # 움직임이 감지되면
 
                 # pir 센서
-                print("motion detected----------------")
+                if self.pir.motion_detected == True:
 
                 # 초음파 센서
-                # print("motion detected----------------", self.ultra.distance)
-                self.state = True
-                self.msg = 'on'
+                # if self.ultra.distance <= self.threshold_distance:
 
-                self.publish()
+                    # pir 센서
+                    print("motion detected----------------")
 
-                if self.camera.recording == False:
-                    print("start recording")
-                    self.now = datetime.datetime.now() # 녹화 시작 시간
-                    self.fname = self.now.strftime("%Y-%m-%d_%H:%M:%S") + '.mp4'
+                    # 초음파 센서
+                    # print("motion detected----------------", self.ultra.distance)
+                    self.state = True
+                    self.msg = 'on'
+
+                    self.publish()
+
+                    if self.camera.recording == False:
+                        print("start recording")
+                        self.now = datetime.datetime.now() # 녹화 시작 시간
+                        self.fname = self.now.strftime("%Y-%m-%d_%H:%M:%S") + '.mp4'
+                        
+                        # threading.Thread(target=self.camera.start_recording, kwargs={'output' : self.fname, 'splitter_port' : self.splitter_port}, daemon=True).start()
+                        # h264 파일은 temp로 저장하고 녹화 종료 후에 fname.mp4로 변환
+                        self.camera.start_recording("/home/pi/iot_workspace/smartdoor/iot-raspberry/mysite/media/"+ "temp.h264", splitter_port=2)
                     
-                    # threading.Thread(target=self.camera.start_recording, kwargs={'output' : self.fname, 'splitter_port' : self.splitter_port}, daemon=True).start()
-                    # h264 파일은 temp로 저장하고 녹화 종료 후에 fname.mp4로 변환
-                    self.camera.start_recording("/home/pi/iot_workspace/smartdoor/iot-raspberry/mysite/media/"+ "temp.h264", splitter_port=2)
-                
-                time.sleep(5)
+                    time.sleep(5)
 
-            # 움직임이 감지되지 않으면
-            else:
-                print("No motion !!!!!!!!!!!!!!!!!!!!!")
-                self.state = False
-                self.msg = 'off'
-                
-                self.publish()
+                # 움직임이 감지되지 않으면
+                else:
+                    print("No motion !!!!!!!!!!!!!!!!!!!!!")
+                    self.state = False
+                    self.msg = 'off'
+                    
+                    self.publish()
 
-                if self.camera.recording == True:
-                    print("stop recording")
-                    self.camera.stop_recording(splitter_port=2)
+                    if self.camera.recording == True:
+                        print("stop recording")
+                        self.camera.stop_recording(splitter_port=2)
 
-                    command = f"MP4Box -add /home/pi/iot_workspace/smartdoor/iot-raspberry/mysite/media/temp.h264 /home/pi/iot_workspace/smartdoor/iot-raspberry/mysite/media/{self.fname}"
-                    call([command], shell=True)
+                        command = f"MP4Box -add /home/pi/iot_workspace/smartdoor/iot-raspberry/mysite/media/temp.h264 /home/pi/iot_workspace/smartdoor/iot-raspberry/mysite/media/{self.fname}"
+                        call([command], shell=True)
 
-                    self.dao.insert_recording_data(self.now, self.fname)
-                
-                time.sleep(1)
+                        self.dao.insert_recording_data(self.now, self.fname)
+                    
+                    time.sleep(1)
+        
+        except Exception as e:
+            print(e)
+
+        finally:
+            self.camera.close()
+
 
 
 pir = Pir(HOST, PORT, topic, msg)

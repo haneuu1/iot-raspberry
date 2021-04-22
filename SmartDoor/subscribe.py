@@ -16,20 +16,20 @@ HOST = '172.30.1.70'# pc
 PORT = 1883
 TOPIC = 'iot/control/#'
 
-# 카메라 수평
-SERVO_CAMERA_VERTICAL = 22
+# 카메라 수직
+SERVO_CAMERA_VERTICAL = 23
 pi_camera_vertical = pigpio.pi()
 pi_camera_vertical.set_servo_pulsewidth(SERVO_CAMERA_VERTICAL, 1500)
 
-# 카메라 수직
-SERVO_CAMERA_HORIZONTAL = 26
-pi_camera_horizontal = pigpio.pi()
-pi_camera_horizontal.set_servo_pulsewidth(SERVO_CAMERA_HORIZONTAL, 1500)
+# # 카메라 수평
+# SERVO_CAMERA_HORIZONTAL = 24
+# pi_camera_horizontal = pigpio.pi()
+# pi_camera_horizontal.set_servo_pulsewidth(SERVO_CAMERA_HORIZONTAL, 1500)
 
-# 도어락
-SERVO_DOOR = 18
-pi_door = pigpio.pi()
-pi_door.set_servo_pulsewidth(SERVO_DOOR, 1500)
+# # 도어락
+# SERVO_DOOR = 18
+# pi_door = pigpio.pi()
+# pi_door.set_servo_pulsewidth(SERVO_DOOR, 1500)
 
 dao = DataDAO()
 
@@ -49,14 +49,14 @@ def subscribe(host, port, topic, forever=True):
         message = msg.payload.decode()
         # msg = msg.payload.decode('utf-8')
         
-        # 카메라 서보 수평 제어
+        # 카메라 서보 수직 제어
         if topic == 'iot/control/camera/servo/vertical':
             value = int(message)
 
             pulse_width = 500 + 11.11*(value+90)
             pi_camera_vertical.set_servo_pulsewidth(SERVO_CAMERA_VERTICAL, pulse_width)
         
-        # 카메라 서보 수직 제어
+        # 카메라 서보 수평 제어
         if topic == 'iot/control/camera/servo/horizontal':
             value = int(message)
 
