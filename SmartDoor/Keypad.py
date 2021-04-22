@@ -2,6 +2,7 @@ import RPi.GPIO as GPIO
 import time
 import json
 import paho.mqtt.client as mqtt
+from gpiozero import Buzzer
 
 # 임시키
 # topic: iot/control/key/temp
@@ -33,6 +34,7 @@ class Keypad():
         self.inputKeys = 16
         self.keyPressed = 0
         
+        self.buzzer = Buzzer(17)
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         GPIO.setup(self.scl, GPIO.OUT)
@@ -93,6 +95,7 @@ class Keypad():
                 
                 if (key != 'd'): # keypad 입력중
                     input += key
+                    self.buzzer.beep(on_time=0.1, n =1)
                     # print(key, input)
 
                 else: # keypad 입력 완료
@@ -138,8 +141,10 @@ class Keypad():
                 if input == self.read_password():
                     print('open!')
                     self.client.publish(self.topic, self.msg) # 문열림
+                    self.buzzer.beep(on_time=0.05, off_time=0.1, n=3)
                 else:
                     print('Password Mismatched!')
+                    self.buzzer.beep(on_time=1, n=1)
             input = ''
 
 
@@ -150,20 +155,22 @@ class Keypad():
             if temporary_key == self.input_password():
                 # open
                 self.client.publish(self.topic, self.msg)
+                self.buzzer.beep(on_time=0.05, off_time=0.1, n=3)
             else:
                 print('Password Mismatched!')
+                self.buzzer.beep(on_time=1, n=1)
         print('end timer')
 
 
 if __name__ == "__main__":
     try:
+        
         keypad = Keypad(HOST, PORT, SCLPin, SDOPin)
         keypad.run()
+        
         # a = keypad.input_password()
         # print(a)
 
     except KeyboardInterrupt:
         pass
         GPIO.cleanup()
-    # finally:
-    #     GPIO.cleanup()
