@@ -11,7 +11,7 @@ router.register('', RecordingDataViewSet)
 urlpatterns = [
     # path('', views.IndexView.as_view(), name='index'),
     # path('<int:pk>/', views.DetailView.as_view(), name='detail')
-    url(r'^admin/', admin.site.urls),
+    # url(r'^admin/', admin.site.urls),
     url(r'^',include(router.urls)),
 ]
 

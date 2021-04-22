@@ -5,7 +5,7 @@ from django import db
 
 class DataDAO:
     def __init__(self):
-        self.host = "172.30.1.31" # 라즈베리파이 ip - database
+        self.host = "192.168.35.243" # 라즈베리파이 ip - database
         self.username = "root"
         self.password = "0000"
         self.databases = "iot_db"
