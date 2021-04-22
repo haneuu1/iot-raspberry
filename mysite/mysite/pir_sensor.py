@@ -13,7 +13,7 @@ from mysite.DAO import DataDAO
 
 from subprocess import call
 
-HOST = '172.30.1.8' # mqtt 브로커 주소 (pc)
+HOST = '192.168.35.71' # mqtt 브로커 주소 (pc)
 PORT = 1883
 
 topic = 'iot/monitor/pir'

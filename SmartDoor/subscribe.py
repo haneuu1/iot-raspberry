@@ -8,8 +8,11 @@ from datetime import datetime
 
 from DAO import DataDAO
 from audio import playsound
+import time
+from Keypad import *
+import threading
 
-HOST = '172.30.1.111'# pc
+HOST = '172.30.1.70'# pc
 PORT = 1883
 TOPIC = 'iot/control/#'
 
@@ -84,6 +87,20 @@ def subscribe(host, port, topic, forever=True):
             else:
                 # buzzer
                 pass
+
+        if topic == 'iot/control/key/temp':
+            scl = 3
+            sdo = 2
+            keypad = Keypad(HOST, PORT, scl, sdo)
+            ix = message.find('_')
+            tpsd = message[0:ix]
+            duration = int(message[ix+1:])
+            print(f'temporary password: {tpsd}')
+            print(f'duration: {duration}')
+            t = threading.Thread(target=keypad.temp_run, args=(tpsd, duration))
+            t.start()
+            # keypad.temp_run(tpsd, duration)
+            
 
     client = mqtt.Client()
     client.on_connect = on_connect
