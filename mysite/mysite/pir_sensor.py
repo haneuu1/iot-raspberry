@@ -13,7 +13,7 @@ from mysite.DAO import DataDAO
 
 from subprocess import call
 
-HOST = '192.168.35.204' # mqtt 브로커 주소 (pc)
+HOST = '192.168.35.100' # mqtt 브로커 주소 (pc)
 PORT = 1883
 
 topic = 'iot/monitor/pir'
@@ -25,10 +25,6 @@ class Pir(threading.Thread):
         
         # pir 센서
         self.pir = MotionSensor(4)
-        
-        # 초음파 센서
-        # self.ultra = DistanceSensor(24, 25, max_distance=1)
-        # self.threshold_distance = 0.3
 
         self.camera = PiCamera()
         self.camera.resolution = (640, 480)
@@ -50,10 +46,12 @@ class Pir(threading.Thread):
 
         self.fname = ""
         self.now = None
+
+        self.video_length = 0
         
     def publish(self):
         self.client.publish(self.topic, self.msg)
-        self.dao.insert_data(self.topic, self.msg)
+        # self.dao.insert_data(self.topic, self.msg)
 
 
     def run(self):
@@ -64,15 +62,7 @@ class Pir(threading.Thread):
 
                 # pir 센서
                 if self.pir.motion_detected == True:
-
-                # 초음파 센서
-                # if self.ultra.distance <= self.threshold_distance:
-
-                    # pir 센서
                     print("motion detected----------------")
-
-                    # 초음파 센서
-                    # print("motion detected----------------", self.ultra.distance)
                     self.state = True
                     self.msg = 'on'
 
@@ -86,6 +76,8 @@ class Pir(threading.Thread):
                         # threading.Thread(target=self.camera.start_recording, kwargs={'output' : self.fname, 'splitter_port' : self.splitter_port}, daemon=True).start()
                         # h264 파일은 temp로 저장하고 녹화 종료 후에 fname.mp4로 변환
                         self.camera.start_recording("/home/pi/iot_workspace/smartdoor/iot-raspberry/mysite/media/"+ "temp.h264", splitter_port=2)
+
+                    self.video_length += 5
                     
                     time.sleep(5)
 
@@ -103,8 +95,13 @@ class Pir(threading.Thread):
 
                         command = f"MP4Box -add /home/pi/iot_workspace/smartdoor/iot-raspberry/mysite/media/temp.h264 /home/pi/iot_workspace/smartdoor/iot-raspberry/mysite/media/{self.fname}"
                         call([command], shell=True)
+                        
+                        video_length_string = f"{self.video_length // 60 : 03d}:{self.video_length % 60}초"
 
-                        self.dao.insert_recording_data(self.now, self.fname)
+                        self.dao.insert_recording_data(self.now, self.fname, video_length_string[1:])
+
+                        self.video_length = 0
+                        
                     
                     time.sleep(1)
         
@@ -113,6 +110,11 @@ class Pir(threading.Thread):
 
         finally:
             self.camera.close()
+
+
+        # while True:
+        #     time.sleep(5)
+        #     print("test")
 
 
 

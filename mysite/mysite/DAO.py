@@ -5,7 +5,7 @@ from django import db
 
 class DataDAO:
     def __init__(self):
-        self.host = "192.168.35.243" # 라즈베리파이 ip - database
+        self.host = "192.168.35.225" # 라즈베리파이 ip - database
         self.username = "root"
         self.password = "0000"
         self.databases = "iot_db"
@@ -54,7 +54,7 @@ class DataDAO:
             self.msg = None
 
     # recording 데이터
-    def insert_recording_data(self, video_timestamp, video_root):
+    def insert_recording_data(self, video_timestamp, video_root, video_length):
 
         self.video_timestamp = video_timestamp
         self.video_root = video_root
@@ -63,11 +63,11 @@ class DataDAO:
         cursor = self.get_cursor(con)
 
         query = """
-        INSERT INTO recording_recordingdata(video_timestamp, video_root) VALUES(%s, %s)
+        INSERT INTO recording_recordingdata(video_timestamp, video_root, video_length) VALUES(%s, %s, %s)
         """
   
         try:
-            cursor.execute(query, (self.video_timestamp.strftime("%Y-%m-%d %H:%M:%S"), self.video_root))
+            cursor.execute(query, (self.video_timestamp.strftime("%Y-%m-%d %H:%M:%S"), self.video_root, video_length))
             con.commit()
 
         except Exception as e:
