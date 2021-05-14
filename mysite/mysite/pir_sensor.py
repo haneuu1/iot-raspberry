@@ -9,11 +9,11 @@ from gpiozero import MotionSensor, DistanceSensor
 
 from picamera import PiCamera
 
-from mysite.DAO import DataDAO
+from DAO import DataDAO
 
 from subprocess import call
 
-HOST = '192.168.35.71' # mqtt 브로커 주소 (pc)
+HOST = # mqtt 브로커 주소 (pc)
 PORT = 1883
 
 topic = 'iot/monitor/pir'

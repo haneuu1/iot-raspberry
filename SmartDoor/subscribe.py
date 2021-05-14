@@ -9,17 +9,17 @@ from datetime import datetime
 from DAO import DataDAO
 from audio import playsound
 import time
-from Keypad import *
+from keypad import keypad
 import threading
 
-HOST = '172.30.1.70'# pc
+HOST = # pc ip
 PORT = 1883
 TOPIC = 'iot/control/#'
 
 # 카메라 수직
 SERVO_CAMERA_VERTICAL = 23
-pi_camera_vertical = pigpio.pi()
-pi_camera_vertical.set_servo_pulsewidth(SERVO_CAMERA_VERTICAL, 1500)
+# pi_camera_vertical = pigpio.pi()
+# pi_camera_vertical.set_servo_pulsewidth(SERVO_CAMERA_VERTICAL, 1500)
 
 # # 카메라 수평
 # SERVO_CAMERA_HORIZONTAL = 24
@@ -32,7 +32,6 @@ pi_camera_vertical.set_servo_pulsewidth(SERVO_CAMERA_VERTICAL, 1500)
 # pi_door.set_servo_pulsewidth(SERVO_DOOR, 1500)
 
 dao = DataDAO()
-
 def subscribe(host, port, topic, forever=True):
 
     def on_connect(client, userdata, flags, rc):
@@ -54,14 +53,14 @@ def subscribe(host, port, topic, forever=True):
             value = int(message)
 
             pulse_width = 500 + 11.11*(value+90)
-            pi_camera_vertical.set_servo_pulsewidth(SERVO_CAMERA_VERTICAL, pulse_width)
+            # pi_camera_vertical.set_servo_pulsewidth(SERVO_CAMERA_VERTICAL, pulse_width)
         
         # 카메라 서보 수평 제어
         if topic == 'iot/control/camera/servo/horizontal':
             value = int(message)
 
             pulse_width = 500 + 11.11*(value+90)
-            pi_camera_horizontal.set_servo_pulsewidth(SERVO_CAMERA_HORIZONTAL, pulse_width)
+            # pi_camera_horizontal.set_servo_pulsewidth(SERVO_CAMERA_HORIZONTAL, pulse_width)
         
         # 안드로이드에서 음성 요청
         if topic == 'iot/control/voice':            
@@ -77,29 +76,28 @@ def subscribe(host, port, topic, forever=True):
 
             if message == 'on':
                 pulse_width = 500 + 11.11*(90+90)
-                pi_door.set_servo_pulsewidth(SERVO_DOOR, pulse_width)
+                # pi_door.set_servo_pulsewidth(SERVO_DOOR, pulse_width)
 
                 time.sleep(3)
 
                 pulse_width = 500 + 11.11*(0+90)
-                pi_door.set_servo_pulsewidth(SERVO_DOOR, pulse_width)
+                # pi_door.set_servo_pulsewidth(SERVO_DOOR, pulse_width)
 
             else:
                 # buzzer
                 pass
 
         if topic == 'iot/control/key/temp':
-            scl = 3
-            sdo = 2
-            keypad = Keypad(HOST, PORT, scl, sdo)
             ix = message.find('_')
             tpsd = message[0:ix]
             duration = int(message[ix+1:])
+            
             print(f'temporary password: {tpsd}')
             print(f'duration: {duration}')
-            t = threading.Thread(target=keypad.temp_run, args=(tpsd, duration))
+
+            t = threading.Thread(target=keypad.temp_run, args=(duration, tpsd))
             t.start()
-            # keypad.temp_run(tpsd, duration)
+            # keypad.temp_run(duration, tpsd)
             
 
     client = mqtt.Client()
